@@ -1,0 +1,24 @@
+:80 {
+  encode zstd gzip
+
+  # New app mounted at /PaddockTS (keep prefix)
+  @paddock path /PaddockTS*
+  handle @paddock {
+    reverse_proxy frontend:3000
+  }
+
+  # New app's API under /PaddockTS/api/* (strip prefix for FastAPI)
+  handle_path /PaddockTS/api/* {
+    reverse_proxy backend:3200
+  }
+
+  # Everything else -> existing site
+  handle {
+    reverse_proxy legacy-gateway:80
+  }
+
+  header {
+    X-Content-Type-Options nosniff
+    Referrer-Policy strict-origin-when-cross-origin
+  }
+}
