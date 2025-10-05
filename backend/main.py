@@ -25,9 +25,8 @@ app.add_middleware(
 )
 
 # STATIC_DIR = Path(__file__).parent / "static"
-STATIC_DIR = Path('/borevitz_projects/data/PaddockTSWeb')
+STATIC_DIR = Path('/borevitz_projects/data/')
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
-PATH_STUB_MAPPING = STATIC_DIR / '.json'
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 @app.post("/run", response_model=RunResponse)
