@@ -2,11 +2,11 @@
 const target = process.env.API_PROXY_TARGET || 'http://localhost:2000';
 
 const nextConfig = {
-  basePath: '',
+  basePath: '/DAESIM',
   async rewrites() {
     return [
       // Browser calls /api/...; Next proxies to your FastAPI backend.
-      { source: '/api/:path*', destination: `${target}/:path*` },
+      { source: '/DAESIM/api/:path*', destination: `${target}/:path*` },
     ];
   },
 };

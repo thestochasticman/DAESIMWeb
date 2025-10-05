@@ -19,6 +19,6 @@ WORKDIR /app
 COPY backend/ /app/
 
 
-EXPOSE 3200
+EXPOSE 2000
 # run uvicorn from the env, not from base
-CMD ["/opt/conda/envs/PaddockTSEnv/bin/uvicorn","main:app","--host","0.0.0.0","--port","3200"]
+CMD ["/opt/conda/envs/PaddockTSEnv/bin/uvicorn","main:app","--host","0.0.0.0","--port","2000"]

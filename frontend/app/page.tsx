@@ -69,25 +69,11 @@ export default function HomePage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="label">Latitude</label>
-              <input
-                className="input"
-                type="number"
-                step="any"
-                value={lat}
-                onChange={(e) => setLat(e.target.value ? parseFloat(e.target.value) : "")}
-                required
-              />
+              <input className="input" type="number" step="any" value={lon} onChange={e=>setLat(parseFloat(e.target.value))} />
             </div>
             <div>
               <label className="label">Longitude</label>
-              <input
-                className="input"
-                type="number"
-                step="any"
-                value={lon}
-                onChange={(e) => setLon(e.target.value ? parseFloat(e.target.value) : "")}
-                required
-              />
+                <input className="input" type="number" step="any" value={lon} onChange={e=>setLon(parseFloat(e.target.value))} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
