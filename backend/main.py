@@ -1,14 +1,14 @@
 from daesim2_analysis.experiment import Experiment
 from fastapi.middleware.cors import CORSMiddleware
 from utils.result_response import ResultResponse
-from utils.run_response import RunResponse
+from fastapi import BackgroundTasks
 from fastapi.staticfiles import StaticFiles
+from utils.run_response import RunResponse
 from utils.run_daesim import run_daesim
-
+from fastapi import HTTPException
 from utils.input import Input
 from fastapi import FastAPI
 from pathlib import Path
-from uuid import uuid4
 import matplotlib
 import os
 
@@ -24,64 +24,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# STATIC_DIR = Path(__file__).parent / "static"
 STATIC_DIR = Path('/borevitz_projects/data/')
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 @app.post("/run", response_model=RunResponse)
-def run_job(i: Input):
-    run_daesim(i=i, static_dir=STATIC_DIR)
-    print('I am here')
-    # Compute or respect stub
-    # if q.stub == q.get_stub():
-    #     job_id = get_stub_job_id(q.stub, PATH_STUB_MAPPING)
-    # else:
-    #     job_id = q.stub
-    # q2 = Query(
-    #     q.lat,
-    #     q.lon,
-    #     q.buffer,
-    #     q.start_time,
-    #     q.end_time,
-    #     q.collections,
-    #     q.bands,
-    #     q.filter,
-    #     stub=job_id,
-    #     tmp_dir=str(STATIC_DIR),
-    #     out_dir=str(STATIC_DIR)
-    # )
+def run_job(i: Input, background_tasks:BackgroundTasks):
+    background_tasks.add_task(run_daesim, i=i, static_dir=STATIC_DIR)
+    # run_daesim(i=i, static_dir=STATIC_DIR)
+    return RunResponse(job_id=i.xsite)
 
-    # # get_outputs(q2)
-    # get_paddocks(q2)
-    # get_paddock_ts(q2)
-    # add_indices_and_veg_frac(q2)
-    # plot(q2)
-    return RunResponse(job_id='1')
+@app.get("/results/{job_id}", response_model=ResultResponse)
+def get_results(job_id: str):
+    job_dir = STATIC_DIR / "DAESIMWeb" / job_id 
+    if not job_dir.exists():
+        raise HTTPException(status_code=404, detail="job_id not found")
 
-# @app.get("/results/{job_id}", response_model=ResultResponse)
-# def get_results(job_id: str):
-# 
-    # job_dir = STATIC_DIR / job_id
-    # if not job_dir.exists():
-    #     raise HTTPException(status_code=404, detail="job_id not found")
+    # Explicitly pick only 2 plots
     
-    # plots = [f"/static/{job_id}/{p.name}" for p in sorted(job_dir.glob("*.png"))]
+    plots = [
+        f"/static/DAESIMWeb/{job_id}_df_forcing.png",
+        f"/static/DAESIMWeb/{job_id}_output.png",
+    ]
 
-
-    # plots = [
-    #     f"static/{job_id}/checkpoints/{job_id}_paddock_map_auto_fourier.png",
-    #     f"static/{job_id}/checkpoints/{job_id}_paddock_map_auto_rgb.png",
-    # ]
-    # videos = [
-    #     # "https://samplelib.com/lib/preview/mp4/sample-5s.mp4"
-    #     f"static/{job_id}/checkpoints/{job_id}_manpad_RGB.mp4",
-    #     f"static/{job_id}/checkpoints/{job_id}_manpad_vegfrac.mp4",
-    # ]
-
-    # meta_path = job_dir / "meta.json"
-    # meta = {}
-    # if meta_path.exists():
-    #     meta = json.loads(meta_path.read_text(encoding="utf-8"))
-
-    # return ResultResponse(status="done", plots=plots, videos=videos, meta=meta)
+    return ResultResponse(status="done", plots=plots, meta={})

@@ -10,6 +10,7 @@ from utils.input import Input
 from pandas import Timestamp
 from os.path import exists
 from pathlib import Path
+from os.path import join
 
 parse_date = lambda x: Timestamp(year=x.year, month=x.month, day=x.day)
 
@@ -25,12 +26,11 @@ def run_daesim(i: Input, static_dir: str):
         df_forcing=df_forcing,
         daesim_config='daesim_configs/DAESIM1.json',
         parameters='parameters/PARAMS1.json',
-        dir_results=f'{static_dir}/DAESIMWeb/'
+        dir_results=join(static_dir, 'DAESIMWeb/')
     )
 
     parameters: Parameters = experiment.parameters
     filename_write = f"DAESIM2-Plant_{experiment.xsite}_{experiment.crop_type}.nc"
-
     model_output = update_and_run_model(
         parameters.init, 
         experiment.PlantX,
@@ -49,6 +49,7 @@ def run_daesim(i: Input, static_dir: str):
             experiment.ForcingDataX.time_index,
             nc_attributes={'title': experiment.title, 'description': experiment.description}
         )
+        print('model ran')
 
     d_fd_mapping = {
         'Climate_solRadswskyb_f': 'forcing 01',
@@ -113,7 +114,7 @@ def run_daesim(i: Input, static_dir: str):
     axes[0].set_xlim([experiment.PlantX.Management.sowingDays[0],model_output[d_fd_mapping['Climate_doy_f']][-1]])
 
     plt.tight_layout()
-    plt.savefig(f'{experiment.dir_results}df_forcing.png')
+    plt.savefig(f'{experiment.dir_results}{i.xsite}_df_forcing.png')
     plt.close()
         
 
@@ -161,6 +162,5 @@ def run_daesim(i: Input, static_dir: str):
     axes[0].set_xlim([experiment.PlantX.Management.sowingDays[0],model_output[d_fd_mapping['Climate_doy_f']][-1]])
 
     plt.tight_layout()
-    plt.savefig(f'{experiment.dir_results}output.png')
+    plt.savefig(f'{experiment.dir_results}{i.xsite}_output.png')
     plt.close()
-    

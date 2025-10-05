@@ -20,11 +20,14 @@ def get_df_forcing(i: Input, static_dir: str)->DataFrame:
     )
     path_df_forcing = f'{q.stub_tmp_dir}/environmental/{q.stub}_DAESim_forcing.csv'
 
+    
+
+    if not exists(path_df_forcing):
+        download_environmental_data(q)
+
     df = read_csv(path_df_forcing)
     df = df.rename(columns={'date': 'Date'})
     df.to_csv(path_df_forcing)
-    # if not exists(path_df_forcing):
-    #     download_environmental_data(q)
     
     # df_forcing = load_df_forcing(path_df_forcing)
     # print(df_forcing)

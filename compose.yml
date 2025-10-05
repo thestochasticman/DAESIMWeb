@@ -8,7 +8,7 @@ services:
     container_name: paddock-backend
     environment:
       PYTHONUNBUFFERED: "1"
-      ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+      ALLOWED_ORIGINS: "http://localhost:2000,http://127.0.0.1:2000"
     volumes:
       - /borevitz_projects/data/PaddockTSWeb/:/app/static          # persist generated artifacts/results
 

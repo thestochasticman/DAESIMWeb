@@ -6,14 +6,12 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 type Result = {
   status: string;
   plots: string[];
-  videos: string[];
   meta: any;
 };
 
-// Base API URL (configure via .env.local: NEXT_PUBLIC_API_URL=http://localhost:8000)
-// const API_RAW = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// Base API URL
 const API_RAW = process.env.NEXT_PUBLIC_API_URL ?? "/api";
-const API = API_RAW.replace(/\/+$/, ""); // strip trailing slash(es)
+const API = API_RAW.replace(/\/+$/, ""); // strip trailing slashes
 
 function resolveSrc(p: string | undefined | null): string {
   if (!p) return "";
@@ -60,6 +58,7 @@ function ImageLightbox({
   );
 }
 
+/* ---------- Clickable zoomable thumbnail ---------- */
 function ZoomableThumb({ src, alt }: { src: string; alt: string }) {
   const [open, setOpen] = useState(false);
   return (
@@ -75,38 +74,7 @@ function ZoomableThumb({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-/* ---------- Simple resizable video (slider) ---------- */
-function ResizableVideo({ src }: { src: string }) {
-  const [w, setW] = useState(800); // px
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-3">
-        <input
-          type="range"
-          min={360}
-          max={1920}
-          value={w}
-          onChange={(e) => setW(parseInt(e.target.value, 10))}
-          className="w-full"
-        />
-        <span className="text-sm w-16 text-right">{w}px</span>
-        <button className="btn" onClick={() => setW(800)}>Fit</button>
-        <button className="btn" onClick={() => setW(Math.round(w * 1.25))}>+25%</button>
-        <button className="btn" onClick={() => setW(Math.round(w * 0.8))}>-20%</button>
-      </div>
-      <video
-        controls
-        preload="metadata"
-        style={{ width: w, height: "auto" }}
-        className="rounded-xl border border-neutral-800"
-        crossOrigin="anonymous"
-      >
-        <source src={src} type="video/mp4" />
-      </video>
-    </div>
-  );
-}
-
+/* ---------- Main page ---------- */
 export default function ResultsPage({ params }: { params: { jobId: string } }) {
   const { jobId } = params;
   const [data, setData] = useState<Result | null>(null);
@@ -126,8 +94,18 @@ export default function ResultsPage({ params }: { params: { jobId: string } }) {
     fetchData();
   }, [jobId]);
 
-  if (error) return <div className="card"><p className="text-red-400">{error}</p></div>;
-  if (!data) return <div className="card"><p>Loading…</p></div>;
+  if (error)
+    return (
+      <div className="card">
+        <p className="text-red-400">{error}</p>
+      </div>
+    );
+  if (!data)
+    return (
+      <div className="card">
+        <p>Loading…</p>
+      </div>
+    );
 
   return (
     <main className="space-y-6">
@@ -138,30 +116,11 @@ export default function ResultsPage({ params }: { params: { jobId: string } }) {
 
       <section className="card">
         <h3 className="text-lg font-medium mb-3">Plots</h3>
-        <div className="grid sm:grid-cols-2 gap-4">
-          {data.plots.map((p, i) => {
+        <div className="grid grid-cols-2 gap-4">
+          {data.plots.slice(0, 2).map((p, i) => {
             const url = resolveSrc(p);
             if (!url) return null;
-            const isTiff =
-              p.toLowerCase().endsWith(".tif") || p.toLowerCase().endsWith(".tiff");
-            return isTiff ? (
-              <a key={i} href={url} target="_blank" rel="noreferrer" className="btn">
-                Download TIFF ({p.split("/").pop()})
-              </a>
-            ) : (
-              <ZoomableThumb key={i} src={url} alt={`plot-${i}`} />
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="card">
-        <h3 className="text-lg font-medium mb-3">Videos</h3>
-        <div className="grid gap-4">
-          {data.videos.map((v, i) => {
-            const url = resolveSrc(v);
-            if (!url) return null;
-            return <ResizableVideo key={i} src={url} />;
+            return <ZoomableThumb key={i} src={url} alt={`plot-${i}`} />;
           })}
         </div>
       </section>
