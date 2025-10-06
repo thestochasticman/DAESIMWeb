@@ -1,136 +1,98 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import QueryPanel from "../../../components/QueryPanel";
+import SubplotFigure from "../../../components/SubPlotFigure";
 
-type Result = {
-  status: string;
-  plots: string[];
-  meta: any;
-};
+const BASE = (process.env.NEXT_PUBLIC_API_URL || "/api").replace(/\/+$/, "");
 
-// Base API URL
 const API_RAW = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 const API = API_RAW.replace(/\/+$/, ""); // strip trailing slashes
 
-function resolveSrc(p: string | undefined | null): string {
-  if (!p) return "";
-  if (p.startsWith("http://") || p.startsWith("https://")) return p;
-  const path = p.startsWith("/") ? p : `/${p}`;
-  return `${API}${path}`;
-}
+type Result = {
+  status: string;
+  plots: any;
+  meta: any;
+};
 
-/* ---------- Image lightbox with zoom + pan ---------- */
-function ImageLightbox({
-  src,
-  alt,
-  onClose,
-}: {
-  src: string;
-  alt: string;
-  onClose: () => void;
-}) {
-  return (
-    <div
-      className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-      onClick={onClose}
-    >
-      <div
-        className="max-w-[90vw] max-h-[90vh]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <TransformWrapper>
-          <TransformComponent>
-            <img
-              src={src}
-              alt={alt}
-              className="max-w-[90vw] max-h-[90vh] object-contain rounded-xl"
-            />
-          </TransformComponent>
-        </TransformWrapper>
-        <div className="mt-2 flex gap-3 justify-end">
-          <button className="btn" onClick={onClose}>
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- Clickable zoomable thumbnail ---------- */
-function ZoomableThumb({ src, alt }: { src: string; alt: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <img
-        src={src}
-        alt={alt}
-        className="w-full h-auto rounded-xl border border-neutral-800 cursor-zoom-in"
-        onClick={() => setOpen(true)}
-      />
-      {open && <ImageLightbox src={src} alt={alt} onClose={() => setOpen(false)} />}
-    </>
-  );
-}
-
-/* ---------- Main page ---------- */
 export default function ResultsPage({ params }: { params: { jobId: string } }) {
   const { jobId } = params;
   const [data, setData] = useState<Result | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // 🔄 Fetch results including query details (meta)
   useEffect(() => {
-    async function fetchData() {
+    async function fetchResults() {
       try {
         const res = await fetch(`${API}/results/${jobId}`);
         if (!res.ok) throw new Error(await res.text());
-        const d: Result = await res.json();
-        setData(d);
+        const json = await res.json();
+        setData(json);
       } catch (err: any) {
-        setError(err.message || "Failed to load");
+        setError(err.message || "Failed to load results");
       }
     }
-    fetchData();
+    fetchResults();
   }, [jobId]);
 
-  if (error)
-    return (
-      <div className="card">
-        <p className="text-red-400">{error}</p>
-      </div>
-    );
-  if (!data)
-    return (
-      <div className="card">
-        <p>Loading…</p>
-      </div>
-    );
-
   return (
-    <main className="space-y-6">
-      <section className="card">
-        <h2 className="text-xl font-medium">Job {jobId}</h2>
-        <p className="text-sm text-neutral-400">Status: {data.status}</p>
-      </section>
+    <div className="fixed inset-0 flex bg-neutral-950 text-white">
+      {/* LEFT: fixed-width query panel */}
+      <div className="w-[340px] border-r border-neutral-800">
+        {/* 👇 Pass query details (meta) to the panel */}
+        <QueryPanel />
+      </div>
 
-      <section className="card">
-        <h3 className="text-lg font-medium mb-3">Plots</h3>
-        <div className="grid grid-cols-2 gap-4">
-          {data.plots.slice(0, 2).map((p, i) => {
-            const url = resolveSrc(p);
-            if (!url) return null;
-            return <ZoomableThumb key={i} src={url} alt={`plot-${i}`} />;
-          })}
-        </div>
-      </section>
+      {/* RIGHT: results display */}
+      <div className="flex-1 overflow-y-auto p-10 space-y-12">
+        {error && (
+          <p className="text-red-400 text-sm border border-red-400/30 rounded-md p-3 bg-red-950/10">
+            {error}
+          </p>
+        )}
+        {!data && !error && (
+          <p className="text-neutral-400 animate-pulse">Loading results…</p>
+        )}
 
-      <section className="card">
-        <h3 className="text-lg font-medium mb-2">Meta</h3>
-        <pre className="text-xs whitespace-pre-wrap break-words bg-neutral-950/50 p-4 rounded-xl border border-neutral-800 overflow-x-auto">
-{JSON.stringify(data.meta, null, 2)}
-        </pre>
-      </section>
-    </main>
+        {data && (
+          <>
+            {/* <header className="border-b border-neutral-800 pb-2">
+              <h1 className="text-3xl font-bold text-cyan-400">
+                Job {jobId}
+              </h1>
+              <p className="text-neutral-400 mt-1 text-sm">
+                Status: {data.status}
+              </p>
+            </header> */}
+
+            {/* Wide plots */}
+            <div className="grid grid-cols-1 2xl:grid-cols-2 gap-x-20 gap-y-16 w-full">
+              <div className="pr-10">
+                <SubplotFigure
+                  plots={data.plots.forcing}
+                  title="Environmental Forcing"
+                />
+              </div>
+              <div className="pl-10 border-l border-neutral-800">
+                <SubplotFigure
+                  plots={data.plots.outputs}
+                  title="DAESIM Plant Growth Summary"
+                />
+              </div>
+            </div>
+
+            {/* Metadata */}
+            <div className="bg-neutral-950 border border-neutral-800 rounded-xl p-6">
+              <h3 className="text-lg font-semibold mb-2 text-cyan-400">
+                Metadata
+              </h3>
+              <pre className="text-xs text-neutral-300 whitespace-pre-wrap break-words">
+                {JSON.stringify(data.meta, null, 2)}
+              </pre>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 }

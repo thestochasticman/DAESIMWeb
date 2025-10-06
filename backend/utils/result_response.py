@@ -5,5 +5,5 @@ from typing import Any
 
 class ResultResponse(BaseModel):
     status: str
-    plots: List[str]
+    plots: dict
     meta: Dict[str, Any]

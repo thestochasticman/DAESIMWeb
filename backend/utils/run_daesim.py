@@ -1,7 +1,9 @@
+from utils.build_daesim_plot_json import build_daesim_plot_json
 from daesim.utils import daesim_io_write_diag_to_nc
 from daesim2_analysis.experiment import Experiment
 from daesim2_analysis.parameters import Parameters
 from utils.get_df_forcing import get_df_forcing
+
 from daesim2_analysis.run import *
 from PaddockTS.query import Query
 from matplotlib.axes import Axes
@@ -11,6 +13,7 @@ from pandas import Timestamp
 from os.path import exists
 from pathlib import Path
 from os.path import join
+from json import dump
 
 parse_date = lambda x: Timestamp(year=x.year, month=x.month, day=x.day)
 
@@ -164,3 +167,7 @@ def run_daesim(i: Input, static_dir: str):
     plt.tight_layout()
     plt.savefig(f'{experiment.dir_results}{i.xsite}_output.png')
     plt.close()
+
+    daesim_json = build_daesim_plot_json(model_output, experiment, d_fd_mapping, yield_from_seed_Cpool, harvest_index_maturity)
+    print(f'{experiment.dir_results}{i.xsite}_plot.json')
+    dump(daesim_json, open(f'{experiment.dir_results}{i.xsite}_plot.json', 'w'))

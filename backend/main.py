@@ -9,8 +9,18 @@ from fastapi import HTTPException
 from utils.input import Input
 from fastapi import FastAPI
 from pathlib import Path
+from json import dump
+from json import load
 import matplotlib
 import os
+import json
+from datetime import date
+
+class DateEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, date):
+            return obj.strftime("%Y/%m/%d")
+        return super().default(obj)
 
 os.environ["MPLBACKEND"] = "Agg"
 matplotlib.use("Agg", force=True)
@@ -31,20 +41,71 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 @app.post("/run", response_model=RunResponse)
 def run_job(i: Input, background_tasks:BackgroundTasks):
     background_tasks.add_task(run_daesim, i=i, static_dir=STATIC_DIR)
-    # run_daesim(i=i, static_dir=STATIC_DIR)
+    meta_path = STATIC_DIR / 'DAESIMWeb/' / f'{i.xsite}_meta.json'
+    # meta = {
+    #     'XSite': i.xsite,
+    #     'Lat': i.lat,
+    #     'Lon': i.lon,
+    #     'sowingDate': str(i.sowing_date),
+    #     'harvestDate': str(i.harvest_date),
+    #     'cropType': i.crop_type
+    # }
+    # dump(meta, open(meta_path, 'w'))
+
+        # always rebuild meta from request object
+    meta = {
+        "XSite": str(i.xsite),
+        "Lat": float(i.lat),
+        "Lon": float(i.lon),
+        "sowingDate": i.sowing_date if isinstance(i.sowing_date, str)
+        else i.sowing_date.strftime("%Y/%m/%d"),
+        "harvestDate": i.harvest_date if isinstance(i.harvest_date, str)
+        else i.harvest_date.strftime("%Y/%m/%d"),
+        "cropType": str(i.crop_type)
+    }
+
+    # overwrite the file each time; ensure it’s flushed completely
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2, cls=DateEncoder)
+        f.flush()
+        os.fsync(f.fileno())
+
     return RunResponse(job_id=i.xsite)
 
 @app.get("/results/{job_id}", response_model=ResultResponse)
 def get_results(job_id: str):
-    job_dir = STATIC_DIR / "DAESIMWeb" / job_id 
-    if not job_dir.exists():
-        raise HTTPException(status_code=404, detail="job_id not found")
+    # job_dir = STATIC_DIR / "DAESIMWeb" / f'{job_id}_plot.json'
+    # if not job_dir.exists():
+    #     raise HTTPException(status_code=404, detail="job_id not found")
 
-    # Explicitly pick only 2 plots
+    # # Explicitly pick only 2 plots
     
-    plots = [
-        f"/static/DAESIMWeb/{job_id}_df_forcing.png",
-        f"/static/DAESIMWeb/{job_id}_output.png",
-    ]
+    # # plots = [
+    # #     f"/static/DAESIMWeb/{job_id}_df_forcing.png",
+    # #     f"/static/DAESIMWeb/{job_id}_output.png",
+    # # ]
+    # plots = load(open('/static/DAESIMWeb/{job_id}_plot.json'))
 
-    return ResultResponse(status="done", plots=plots, meta={})
+    # return ResultResponse(status="done", plots=plots, meta={})
+
+    plot_path = STATIC_DIR / 'DAESIMWeb'/ f'{job_id}_plot.json'
+    meta_path = STATIC_DIR / 'DAESIMWeb/' / f'{job_id}_meta.json'
+    if not plot_path.exists():
+        raise HTTPException(status_code=404, detail=f"Results for job {job_id} not found")
+
+    if not meta_path.exists():
+        raise HTTPException(status_code=404, detail=f"Results for job {job_id} not found")
+
+    # plots = load(open(plot_path))
+    # meta = load(open(meta_path))
+    # print(meta)
+
+    with open(plot_path) as pf, open(meta_path) as mf:
+        plots = json.load(pf)
+        meta = json.load(mf)
+
+    # sanity check
+    print("Loaded META:", meta)
+
+    return ResultResponse(status="done", plots=plots, meta=meta)
+    # return ResultResponse(status="done", plots=plots, meta=meta)
