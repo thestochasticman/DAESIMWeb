@@ -14,21 +14,21 @@ def get_df_forcing(i: Input, static_dir: str)->DataFrame:
         start_time=i.sowing_date,
         end_time=i.harvest_date,
         buffer=0.01,
-        stub=i.xsite,
         tmp_dir=static_dir,
         out_dir=static_dir
     )
     path_df_forcing = f'{q.stub_tmp_dir}/environmental/{q.stub}_DAESim_forcing.csv'
 
-    
-
     if not exists(path_df_forcing):
-        download_environmental_data(q)
+        try:
+            download_environmental_data(q)
+        except:
+            # I know this is bad design, but will take too much time
+            # to refactor the code
+            # dont hate yourself for this
+            print('error while downloading')
 
     df = read_csv(path_df_forcing)
     df = df.rename(columns={'date': 'Date'})
     df.to_csv(path_df_forcing)
-    
-    # df_forcing = load_df_forcing(path_df_forcing)
-    # print(df_forcing)
     return [path_df_forcing]

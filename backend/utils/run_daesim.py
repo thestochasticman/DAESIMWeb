@@ -42,17 +42,17 @@ def run_daesim(i: Input, static_dir: str):
         parameters.problem
     )
 
-    if not exists(f"{experiment.dir_results}{filename_write}"):
+    # if not exists(f"{experiment.dir_results}{filename_write}"):
 
-        daesim_io_write_diag_to_nc(
-            experiment.PlantX,
-            model_output,
-            experiment.dir_results,
-            filename_write,
-            experiment.ForcingDataX.time_index,
-            nc_attributes={'title': experiment.title, 'description': experiment.description}
-        )
-        print('model ran')
+    #     daesim_io_write_diag_to_nc(
+    #         experiment.PlantX,
+    #         model_output,
+    #         experiment.dir_results,
+    #         filename_write,
+    #         experiment.ForcingDataX.time_index,
+    #         nc_attributes={'title': experiment.title, 'description': experiment.description}
+    #     )
+        # print('model ran')
 
     d_fd_mapping = {
         'Climate_solRadswskyb_f': 'forcing 01',
@@ -119,8 +119,6 @@ def run_daesim(i: Input, static_dir: str):
     plt.tight_layout()
     plt.savefig(f'{experiment.dir_results}{i.xsite}_df_forcing.png')
     plt.close()
-        
-
     fig, axes = plt.subplots(5,1,figsize=(8,10),sharex=True)
 
     axes[0].plot(model_output['t'], model_output["LAI"])
@@ -169,5 +167,4 @@ def run_daesim(i: Input, static_dir: str):
     plt.close()
 
     daesim_json = build_daesim_plot_json(model_output, experiment, d_fd_mapping, yield_from_seed_Cpool, harvest_index_maturity)
-    print(f'{experiment.dir_results}{i.xsite}_plot.json')
     dump(daesim_json, open(f'{experiment.dir_results}{i.xsite}_plot.json', 'w'))

@@ -1,26 +1,22 @@
 from daesim2_analysis.experiment import Experiment
 from fastapi.middleware.cors import CORSMiddleware
 from utils.result_response import ResultResponse
-from fastapi import BackgroundTasks
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from utils.run_response import RunResponse
+from utils.date_encoder import DateEncoder
 from utils.run_daesim import run_daesim
+from fastapi import BackgroundTasks
 from fastapi import HTTPException
 from utils.input import Input
 from fastapi import FastAPI
+from os.path import exists
 from pathlib import Path
 from json import dump
 from json import load
 import matplotlib
-import os
 import json
-from datetime import date
-
-class DateEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, date):
-            return obj.strftime("%Y/%m/%d")
-        return super().default(obj)
+import os
 
 os.environ["MPLBACKEND"] = "Agg"
 matplotlib.use("Agg", force=True)
@@ -40,19 +36,10 @@ STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 @app.post("/run", response_model=RunResponse)
 def run_job(i: Input, background_tasks:BackgroundTasks):
-    background_tasks.add_task(run_daesim, i=i, static_dir=STATIC_DIR)
     meta_path = STATIC_DIR / 'DAESIMWeb/' / f'{i.xsite}_meta.json'
-    # meta = {
-    #     'XSite': i.xsite,
-    #     'Lat': i.lat,
-    #     'Lon': i.lon,
-    #     'sowingDate': str(i.sowing_date),
-    #     'harvestDate': str(i.harvest_date),
-    #     'cropType': i.crop_type
-    # }
-    # dump(meta, open(meta_path, 'w'))
-
-        # always rebuild meta from request object
+    background_tasks.add_task(run_daesim, i=i, static_dir=STATIC_DIR)
+    
+    
     meta = {
         "XSite": str(i.xsite),
         "Lat": float(i.lat),
