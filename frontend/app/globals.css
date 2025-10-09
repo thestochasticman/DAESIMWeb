@@ -56,3 +56,17 @@ html, body {
   background-clip: text;
   color: transparent;
 }
+
+/* @media print {
+  @page {
+    size: A0 landscape;
+    margin: 0;
+  }
+  body {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  img {
+    break-inside: avoid;
+  }
+} */

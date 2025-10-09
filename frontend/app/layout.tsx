@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <div className="container py-8">
           <header className="mb-8 flex items-center justify-between">
-            <h1 className="text-2xl gradient-title">DAESIM</h1>
+            <h1 className="text-2xl gradient-title"></h1>
             <nav className="space-x-2">
               {/* <Link className="btn btn-red" href="/">Home</Link> */}
               {/* <Link className="btn btn-green" href="/about">About</Link> */}
