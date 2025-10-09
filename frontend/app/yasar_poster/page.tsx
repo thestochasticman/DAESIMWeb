@@ -467,8 +467,8 @@ export default function YasarPoster() {
                     <iframe
                         src="/"
                         style={{
-                        width: "100%",
-                        height: "100%",
+                        width: "110%",
+                        height: "110%",
                         border: "none",
                         backgroundColor: "#000",
                         transform: "scale(0.9)",
@@ -477,6 +477,12 @@ export default function YasarPoster() {
                         title="DAESIM App"
                     />
                     </article>
+
+
+                    
+
+
+                    
 
 
                      </main>

@@ -57,7 +57,7 @@ html, body {
   color: transparent;
 }
 
-/* @media print {
+@media print {
   @page {
     size: A0 landscape;
     margin: 0;
@@ -69,4 +69,4 @@ html, body {
   img {
     break-inside: avoid;
   }
-} */
+}
