@@ -57,7 +57,7 @@ html, body {
   color: transparent;
 }
 
-@media print {
+/* @media print {
   @page {
     size: A0 landscape;
     margin: 0;
@@ -68,5 +68,46 @@ html, body {
   }
   img {
     break-inside: avoid;
+  }
+} */
+
+
+@media print {
+  @page {
+    size: 1189mm 841mm; /* A0 Landscape exact size */
+    margin: 0;
+  }
+
+  html, body {
+    width: 1189mm;
+    height: 841mm;
+    margin: 0;
+    padding: 0;
+    background: #000 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    overflow: hidden;
+  }
+
+  /* Make the poster fit exactly to page */
+  .poster {
+    width: 1189mm !important;
+    height: 841mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 auto !important;
+    page-break-inside: avoid;
+  }
+
+  img, iframe, video {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Optional: Hide scrollbars or UI decorations */
+  ::-webkit-scrollbar {
+    display: none;
   }
 }

@@ -10,6 +10,7 @@ services:
       PYTHONUNBUFFERED: "1"
       ALLOWED_ORIGINS: "http://localhost:2000,http://127.0.0.1:2000"
     volumes:
+      - ./Backend:/app/Backend
       - /borevitz_projects/data/:/borevitz_projects/data/          # persist generated artifacts/results
 
     restart: always
@@ -29,6 +30,9 @@ services:
     restart: always
     networks:
       - edge
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
 
   # caddy:
   #   image: caddy:2

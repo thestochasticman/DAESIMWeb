@@ -374,7 +374,7 @@ export default function YasarPoster() {
                 }}
             
             >
-              <h3>Features</h3>
+              <h3>Other Features</h3>
                 <ul
                 style={{
                     marginLeft: "0",
@@ -465,7 +465,7 @@ export default function YasarPoster() {
                     </h3>
 
                     <iframe
-                        src="/"
+                        src="/DAESIM"
                         style={{
                         width: "110%",
                         height: "110%",
@@ -476,17 +476,45 @@ export default function YasarPoster() {
                         }}
                         title="DAESIM App"
                     />
-                    </article>
+            </article>
 
+                        <article
+                    className="card"
+                    style={{
+                        gridColumn: "span 2",
+                        height: "600mm",
+                        background: "rgba(0,0,0,0.8)",
+                        border: "1mm solid rgba(0,255,255,0.4)",
+                        borderRadius: "8mm",
+                        overflow: "hidden",
+                    }}
+                    >
+                    <h3
+                        style={{
+                        color: "#00ffff",
+                        textAlign: "center",
+                        marginBottom: "8mm",
+                        }}
+                    >
+                        Live Paddock Segmentation
+                    </h3>
 
-                    
+                    <iframe
+                        src="/PaddockTS/results/1"
+                        style={{
+                        width: "100%",
+                        height: "100%",
+                        border: "none",
+                        backgroundColor: "#000",
+                        transform: "scale(0.9)",
+                        transformOrigin: "top center",
+                        }}
+                        title="DAESIM App"
+                    />
+            </article>
 
-
-                    
-
-
-                     </main>
-
+            
+          </main>
           <footer className="footer">
             <div>
               <strong>Project:</strong> 130.56.246.157/DAESIM/yasar_poster
