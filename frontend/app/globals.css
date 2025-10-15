@@ -111,3 +111,10 @@ html, body {
     display: none;
   }
 }
+
+@media print {
+  .poster {
+    transform: scale(0.90);
+    transform-origin: center;
+  }
+}

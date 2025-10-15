@@ -5,14 +5,17 @@ export default function YasarPoster() {
     <div className="poster-wrap">
       <style>{`
         :root {
-          --bg: #000;
-          --poster: #000;
-          --cyan: #00ffff;
-          --green: #22c55e;
+          --bg: #0a0a0a;
+          --poster: #0a0a0a;
+          --cyan: #18dfdfff;
+          --cyan2: #18dfdfff;
+          --green: #056b2aff;
           --ink: #ffffff;
           --muted: #9ca3af;
           --gap: 8mm;
           --margin: 18mm;
+          --border: #6b7280; /* 🩶 neutral grey border color */
+          --red: #c52222ff;
         }
 
         * { box-sizing: border-box; }
@@ -42,9 +45,9 @@ export default function YasarPoster() {
         .poster {
           background: var(--poster);
           width: 100vw;
-          height: 100vh;
-          border: 0.8vh solid var(--cyan);
-          box-shadow: 0 0 80px rgba(93, 172, 172, 0.4);
+          height: 100vh;border
+          // border: 0.8vh solid var(--border);
+          // box-shadow: 0 0 80px rgba(93, 172, 172, 0.4);
           position: relative;
           display: flex;
           flex-direction: column;
@@ -64,7 +67,7 @@ export default function YasarPoster() {
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
-          border-bottom: 4px solid var(--cyan);
+          border-bottom: 4px solid var(--border);
           padding-bottom: 2vh;
         }
 
@@ -84,8 +87,8 @@ export default function YasarPoster() {
           margin: 0;
           font-size: 3.5rem;
           font-weight: 800;
-          color: var(--cyan);
-          text-shadow: 0 0 20px rgba(21, 196, 196, 0.6);
+          // color: var(--green);
+          text-shadow: none
         }
 
         .meta {
@@ -99,11 +102,13 @@ export default function YasarPoster() {
           grid-template-columns: 1.2fr 1fr;
           gap: 2rem;
           margin-top: 4vh;
+          font-size: 2rem
+
         }
 
         .abstract {
           background: rgba(0,255,255,0.08);
-          border-left: 6px solid var(--cyan);
+          border-left: 6px solid var(--border);
           padding: 1rem 1.5rem;
           border-radius: 0.5rem;
         }
@@ -125,7 +130,7 @@ export default function YasarPoster() {
           border-left: 6px solid var(--green);
           padding: 0.8rem 1.2rem;
           border-radius: 0.5rem;
-          font-size: 1.1rem;
+          font-size: 2.1rem;
         }
 
         .body {
@@ -137,7 +142,7 @@ export default function YasarPoster() {
 
         .card {
           border: 1px solid rgba(255,255,255,0.2);
-          background: rgba(255,255,255,0.05);
+          background: #0a0a0a;
           border-radius: 0.8rem;
           padding: 1.5rem;
         }
@@ -147,7 +152,7 @@ export default function YasarPoster() {
           font-weight: 700;
           margin-bottom: 1rem;
           font-size: 1.8rem;
-          color: var(--green);
+          color: var(--cyan2);
           border-bottom: 1px solid rgba(255,255,255,0.2);
           padding-bottom: 0.5rem;
         }
@@ -159,9 +164,9 @@ export default function YasarPoster() {
 
         .figure img {
           max-width: 100%;
-          border: 2px solid var(--cyan);
+          border: 2px solid var(--grey);
           border-radius: 0.5rem;
-          box-shadow: 0 0 20px rgba(0,255,255,0.2);
+          // box-shadow: 0 0 20px rgba(0,255,255,0.2);
         }
 
         .caption {
@@ -191,8 +196,8 @@ export default function YasarPoster() {
         <div className="poster-inner">
           <header className="header">
             <div className="title">
-              <div className="kicker">DAESIM Project</div>
-              <h1>Crop Management using Bio Physical Model</h1>
+              <div className="kicker">DAESIM: Dynamic Agro Ecosystem SIMulator</div>
+              <h1>CROP MANAGEMENT USING BIO PHYSICAL MODEL</h1>
             </div>
             <div className="meta">
               <div><strong>Yasar Adeel Ansari</strong> · ANU Borevitz Labs</div>
@@ -205,22 +210,33 @@ export default function YasarPoster() {
             <article className="abstract">
               <h2>Abstract</h2>
               <p>
-                The school of RSB has developed a bio physical model that simulates the growth of a given crop in different environmental conditions.
-                The model leverages first principles of physics and plant physiology to model crop growth. My project aims to calibrate this model to
-                facilitate crop management across Australia. 
+                The school of RSB has developed a biophysical model that simulates the growth of a given crop under diverse environmental conditions.
+                The model leverages first principles of physics and plant physiology to capture crop development. With this project,
+                the model is scaled for deployment across Australia. And is currently being calibrated to provide accurate estimates for the very
+                diverse conditions of Australia. Our goal is for this to be a tool that helps people decide "What to grow, when to grow it and how to go about
+                growing it."
               </p>
             </article>
 
             <aside className="keypoints">
               <div className="badge">
-                <strong>Aim 1:</strong> Deploy the model across Australia.
+                <strong>DATA INTEGRATION</strong>
               </div>
               <div className="badge">
-                <strong>Aim 2:</strong> Calibrate the model using phenology datasets.
+                <strong>PRE PROCESSING</strong>
               </div>
-              {/* <div className="badge">
-                <strong>Aim 3:</strong> Use model to generate crop portfolio for farmers.
-              </div> */}
+              <div className="badge">
+                <strong>MATHEMATICAL MODELING</strong>
+              </div>
+              <div className="badge">
+                <strong>LARGE SCALE SIMULATION RUNS</strong>
+              </div>
+              <div className="badge">
+                <strong>FRONT END DEVELOPMENT</strong>
+              </div>
+              <div className="badge">
+                <strong>DOCKER CONTAINERISATION</strong>
+              </div>
             </aside>
           </section>
 
@@ -313,14 +329,14 @@ export default function YasarPoster() {
                 className="card"
                 style={{
                     gridColumn: "span 2",
-                    height: "120mm",
-                    background: "rgba(0,0,0,0.8)",
-                    border: "1mm solid rgba(0,255,255,0.4)",
+                    height: "140mm",
+                    background: "#0a0a0a",
+                    border: "1mm solid var(--border)",
                     borderRadius: "8mm",
                     overflow: "hidden",
                 }}
                 >
-                <h3>Bio Mass over time</h3>
+                <h3>Bio Mass of stem, root, seed, and leaves over time</h3>
 
                 {/* <ul
                 style={{
@@ -357,7 +373,7 @@ export default function YasarPoster() {
                 </ul> */}
                 <div className="figure">
                 <img src="carbon_allocation.png" alt="Pipeline" />
-                <div className="caption">System pipeline for simulation.</div>
+                {/* <div className="caption">System pipeline for simulation.</div> */}
               </div>
 
             </article>
@@ -366,15 +382,15 @@ export default function YasarPoster() {
 
             style={{
                     gridColumn: "span 3",
-                    height: "60mm",
-                    background: "rgba(0,0,0,0.8)",
-                    border: "1mm solid rgba(0,255,255,0.4)",
+                    height: "140mm",
+                    background: "#0a0a0a",
+                    border: "1mm solid var(--border)",
                     borderRadius: "8mm",
                     overflow: "hidden",
                 }}
             
             >
-              <h3>Other Features</h3>
+              <h3>Some features and use cases</h3>
                 <ul
                 style={{
                     marginLeft: "0",
@@ -396,6 +412,31 @@ export default function YasarPoster() {
                     3. Study processes like transpiration, photosynthesis, carbon allocation, etc
                 </li>
 
+
+                <li>
+                    4. Plan ahead by getting tentative harvest and sowing date.
+                </li>
+
+                <li>
+                    5. Don't have to focus on maximising yield everytime. This model can help
+                    the user choose a crop that might mature faster while giving decent yield. The
+                    user could then beat their competitors to the market.  
+                </li>
+
+                <li>
+                  6. This poster itself is hosted on http://130.56.246.157/DAESIM/yasar_poster
+                </li>
+
+                <li>
+                  7. The model can be run from http://130.56.246.157/DAESIM/
+                </li>
+
+                <li>
+                  8. PaddockTS is one of the data integration and packages we had to build
+                    to deploy DAESIM. It was mainly created to create ground truth for time of
+                    growth stages for different crops. For the calibration of DAESIM.
+                </li>
+
                 </ul>
             </article>
 
@@ -403,9 +444,9 @@ export default function YasarPoster() {
 
             style={{
                     gridColumn: "span 3",
-                    height: "60mm",
-                    background: "rgba(0,0,0,0.8)",
-                    border: "1mm solid rgba(0,255,255,0.4)",
+                    height: "140mm",
+                    background: "#0a0a0a",
+                    border: "1mm solid var(--border)",
                     borderRadius: "8mm",
                     overflow: "hidden",
                 }}
@@ -428,7 +469,8 @@ export default function YasarPoster() {
                 <li>
                     2. Calibrate the model for different cultivars across different sites.
                 </li>
-
+                    3. By simulating the future environment using markov simulations,
+                       We can allocate land to grow multiple crops where each crop acts as a hedge to the other.
                 </ul>
             </article>
 
@@ -440,6 +482,7 @@ export default function YasarPoster() {
               </p>
             </article> */}
             
+            
 
         
 
@@ -447,16 +490,16 @@ export default function YasarPoster() {
                     className="card"
                     style={{
                         gridColumn: "span 6",
-                        height: "600mm",
-                        background: "rgba(0,0,0,0.8)",
-                        border: "1mm solid rgba(0,255,255,0.4)",
+                        height: "400mm",
+                        background: "#0a0a0a",
+                        border: "1mm solid var(--border)",
                         borderRadius: "8mm",
                         overflow: "hidden",
                     }}
                     >
                     <h3
                         style={{
-                        color: "#00ffff",
+                        color: "var(--cyan2)",
                         textAlign: "center",
                         marginBottom: "8mm",
                         }}
@@ -465,12 +508,12 @@ export default function YasarPoster() {
                     </h3>
 
                     <iframe
-                        src="/DAESIM"
+                        src="/DAESIM/results/test_2"
                         style={{
-                        width: "110%",
-                        height: "110%",
+                        width: "100%",
+                        height: "100%",
                         border: "none",
-                        backgroundColor: "#000",
+                        backgroundColor: "#0a0a0a",
                         transform: "scale(0.9)",
                         transformOrigin: "top center",
                         }}
@@ -482,16 +525,16 @@ export default function YasarPoster() {
                     className="card"
                     style={{
                         gridColumn: "span 2",
-                        height: "600mm",
-                        background: "rgba(0,0,0,0.8)",
-                        border: "1mm solid rgba(0,255,255,0.4)",
+                        height: "400mm",
+                        background: "#0a0a0a",
+                        border: "1mm solid var(--border)",
                         borderRadius: "8mm",
                         overflow: "hidden",
                     }}
                     >
                     <h3
                         style={{
-                        color: "#00ffff",
+                        color: "var(--cyan2)",
                         textAlign: "center",
                         marginBottom: "8mm",
                         }}
@@ -505,15 +548,13 @@ export default function YasarPoster() {
                         width: "100%",
                         height: "100%",
                         border: "none",
-                        backgroundColor: "#000",
+                        backgroundColor: "#0a0a0a",
                         transform: "scale(0.9)",
                         transformOrigin: "top center",
                         }}
                         title="DAESIM App"
                     />
             </article>
-
-            
           </main>
           <footer className="footer">
             <div>

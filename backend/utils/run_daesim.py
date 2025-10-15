@@ -162,7 +162,7 @@ def run_daesim(i: Input, static_dir: str):
 
     axes[0].set_xlim([experiment.PlantX.Management.sowingDays[0],model_output[d_fd_mapping['Climate_doy_f']][-1]])
 
-    plt.tight_layout()
+    # plt.tight_layout()
     plt.savefig(f'{experiment.dir_results}{i.xsite}_output.png')
     plt.close()
 

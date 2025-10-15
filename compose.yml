@@ -30,9 +30,9 @@ services:
     restart: always
     networks:
       - edge
-    volumes:
-      - ./frontend:/app/frontend
-      - /app/frontend/node_modules
+    # volumes:
+    #   - ./frontend:/app/frontend
+    #   - /app/frontend/node_modules
 
   # caddy:
   #   image: caddy:2
