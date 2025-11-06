@@ -133,7 +133,7 @@ export default function QueryPanel() {
           placeholder="2020/01/01"
         />
 
-        {/* 🌾 Harvest Date */}
+        {/* Harvest Date */}
         <label className="text-sm text-neutral-400">Harvest Date (yyyy/mm/dd)</label>
         <input
           type="text"
