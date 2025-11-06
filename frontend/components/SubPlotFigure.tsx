@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
 
-// 👇 TypeScript doesn’t have types for react-plotly.js, so ignore type checking for this import.
+//  TypeScript doesn’t have types for react-plotly.js, so ignore type checking for this import.
  // This keeps Docker/Next.js build happy
 
 const Plot: any = dynamic(() => import("react-plotly.js"), { ssr: false });
@@ -52,7 +52,7 @@ export default function SubplotFigure({
         (sub.series ?? []).forEach((s: any, idx: number) => {
           let color = PALETTE[idx % PALETTE.length];
 
-          // 🔵 Highlight humidity & transpiration
+          //  Highlight humidity & transpiration
           if (
             s.label?.toLowerCase().includes("humidity") ||
             s.label?.toLowerCase().includes("transpiration") ||
@@ -63,7 +63,7 @@ export default function SubplotFigure({
             color = "#00BFFF"; // bright blue
           }
 
-          // 🔴 Highlight soil variables
+          //  Highlight soil variables
           if (
             s.label?.toLowerCase().includes("soil") ||
             s.key_prefix?.includes("soil") ||

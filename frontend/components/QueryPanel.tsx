@@ -14,7 +14,7 @@ const normalizeDate = (dateStr: string) => dateStr.replaceAll("/", "-");
 export default function QueryPanel() {
   const router = useRouter();
 
-  // ✅ default values
+  // default values
   const [xsite, setXsite] = useState("test_1");
   const [lat, setLat] = useState("-33.504");
   const [lon, setLon] = useState("148.4");
@@ -28,7 +28,7 @@ export default function QueryPanel() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 🔄 Poll job status
+  //  Poll job status
   useEffect(() => {
     if (status !== "running" || !jobId) return;
     const interval = setInterval(async () => {
@@ -48,7 +48,7 @@ export default function QueryPanel() {
     return () => clearInterval(interval);
   }, [status, jobId, router]);
 
-  // ▶️ Run simulation
+  //  Run simulation
   async function handleRun() {
     setStatus("running");
     setError(null);

@@ -23,9 +23,7 @@ def get_df_forcing(i: Input, static_dir: str)->DataFrame:
         try:
             download_environmental_data(q)
         except:
-            # I know this is bad design, but will take too much time
-            # to refactor the code
-            # dont hate yourself for this
+       
             print('error while downloading')
 
     df = read_csv(path_df_forcing)
