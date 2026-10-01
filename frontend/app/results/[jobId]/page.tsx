@@ -13,6 +13,7 @@ type Result = {
   status: string;
   plots: any;
   meta: any;
+  error?: string | null;
 };
 
 export default function ResultsPage({ params }: { params: { jobId: string } }) {
