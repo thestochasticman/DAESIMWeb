@@ -47,6 +47,19 @@ Override `PORT`, `DAESIM_STATIC_DIR`, `DAESIM_MAX_WORKERS`, `TROI_OUTDIR`, `TROI
 `run.sh` uses `--reload` for development; the container does not, since a reload
 kills in-flight runs.
 
+## Frontend: map and Google Maps key
+
+The home page is a Google map (hybrid imagery) with a draggable site marker,
+like paddocktimeseries.net; the query bar above it takes coordinates as
+`lat, lon` and stays in place across the map and results views. The map needs
+a browser key in `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`:
+
+- `.env` at the repo root (gitignored): docker compose reads it and passes the
+  key as a build arg to the frontend image;
+- `frontend/.env.local` (gitignored): read by `npm run dev`.
+
+See `.env.example`. Without a key the home page shows a notice instead of the map.
+
 ## Deployment
 
 Start the caddy container in
@@ -58,7 +71,7 @@ sudo docker network ls --filter name=^edge$ --format '{{.Name}}'   # expect: edg
 sudo docker network create edge                                     # if missing
 ```
 
-Build and start:
+Build and start (the frontend build bakes in the Maps key from `.env`):
 
 ```
 sudo docker compose build backend frontend

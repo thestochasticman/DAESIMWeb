@@ -46,6 +46,8 @@ services:
       args:
         NEXT_PUBLIC_API_URL: /DAESIM/api
         NEXT_BASEPATH: /DAESIM
+        # from the gitignored root .env (see .env.example)
+        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:-}
     container_name: daesim-frontend
     environment:
       NODE_ENV: production
