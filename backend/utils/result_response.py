@@ -1,9 +1,9 @@
 from pydantic import BaseModel
-from typing import Dict
-from typing import List
-from typing import Any
+from typing import Any, Dict, Optional
+
 
 class ResultResponse(BaseModel):
-    status: str
-    plots: dict
+    status: str                      # running | done | error
+    plots: dict                      # empty unless status == "done"
     meta: Dict[str, Any]
+    error: Optional[str] = None      # set when status == "error"

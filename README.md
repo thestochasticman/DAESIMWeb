@@ -6,27 +6,46 @@ forcing assembled by [paddocktimeseries](https://github.com/johnburley3000/paddo
 ## How the backend is wired
 
 Nothing is installed in the backend image. It runs on the host's conda env
-`paddockts-env` (Python 3.11, the paddocktimeseries native stack, plus
-`SALib`, which daesim2-analysis needs) and on volume-mounted checkouts:
+`paddockts-env` (Python 3.11, the paddocktimeseries native stack, plus the
+extras in `backend/requirements-paddockts-env.txt`) and on volume-mounted checkouts:
 
 | Checkout | Branch | Used for |
 |---|---|---|
 | `/borevitz_projects/repos/paddocktimeseries` | main | `PaddockTS.daesim_forcing` + `troi` (SILO/OzWALD forcing) |
 | `/borevitz_projects/repos/DAESIM` | `yasar` (fork of NortonAlex/DAESIM) | the model |
-| `/borevitz_projects/repos/daesim2-analysis` | main | `Experiment`, `update_and_run_model` |
+| `/borevitz_projects/repos/daesim2-analysis` | main (local `yasar` = main) | `Experiment`, `update_and_run_model` |
 
+## Jobs, caching and concurrency
+
+A job is identified by what determines its output, not by the site label:
+the troi stub (bbox snapped to ~100 m + dates), the crop type, and the
+contents of `backend/daesim_configs/DAESIM1.json` and
+`backend/parameters/PARAMS1.json`. `POST /run` returns that key as `job_id`
+(`xsite` is kept as a label in `meta.json`), so
+
+- identical requests share one result and are never computed twice;
+- a request whose run is still in flight is not started again
+  (in-process set + a per-job `flock`, so this also holds across workers or
+  a restart);
+- `GET /results/{job_id}` returns `status: running | done | error` (with the
+  error text), instead of 404 while a run is in progress;
+- model runs go through a small worker pool (`DAESIM_MAX_WORKERS`, default 2);
+- status, forcing CSV and `plot.json` are written atomically (temp + rename).
+
+Results live in `/borevitz_projects/data/DAESIMWeb/{job_id}/`
+(`plot.json`, `meta.json`, `status.json`, `df_forcing.png`, `output.png`).
 Forcing data is cached by troi: raw SILO/OzWALD observations under
 `/borevitz_projects/data/PaddockTSWeb/{silo,ozwald}_store` (shared with
 PaddockTSWeb), the per-site table under `/borevitz_projects/data/DAESIMWeb/troi/`.
-Results (`{xsite}_plot.json`, `{xsite}_meta.json`, PNGs) go to
-`/borevitz_projects/data/DAESIMWeb/`.
 
 ## Run locally
 
 ```
 backend/run.sh            # uvicorn on :2000, env vars as in compose.yml
 ```
-Override `PORT`, `DAESIM_STATIC_DIR`, `TROI_OUTDIR`, `TROI_TMPDIR` as needed.
+Override `PORT`, `DAESIM_STATIC_DIR`, `DAESIM_MAX_WORKERS`, `TROI_OUTDIR`, `TROI_TMPDIR` as needed.
+`run.sh` uses `--reload` for development; the container does not, since a reload
+kills in-flight runs.
 
 ## Deployment
 

@@ -39,6 +39,9 @@ export default function QueryPanel() {
           if (data.status === "done") {
             setStatus("done");
             router.push(`/results/${jobId}`);
+          } else if (data.status === "error") {
+            setError(data.error || "Run failed");
+            setStatus("error");
           }
         }
       } catch {
@@ -73,7 +76,13 @@ export default function QueryPanel() {
       const json = await res.json();
       const newJobId = json.job_id ?? json.jobId ?? xsite;
       setJobId(newJobId);
-      setStatus("running");
+      if (json.status === "done") {
+        // identical inputs were run before; the result is already cached
+        setStatus("done");
+        router.push(`/results/${newJobId}`);
+      } else {
+        setStatus("running");
+      }
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Run failed");

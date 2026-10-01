@@ -1,0 +1,16 @@
+# The backend runs on the host conda env `paddockts-env`, built from
+# paddocktimeseries/environment.yml plus its pyproject pins (troi-core, the
+# pysilo/pyozwald/... stores). These are the extras this backend needs on top:
+#
+#   conda activate paddockts-env
+#   pip install -r backend/requirements-paddockts-env.txt
+#
+# DAESIM and daesim2-analysis are not installed; they are imported from the
+# volume-mounted checkouts via PYTHONPATH (see compose.yml / run.sh).
+fastapi>=0.111
+uvicorn>=0.29
+pydantic>=2
+SALib>=1.5        # daesim2_analysis.parameters / utils
+netCDF4           # daesim2_analysis.run
+matplotlib
+pandas

@@ -76,7 +76,7 @@ export default function SubplotFigure({
             Object.entries(plots[s.key_prefix]).forEach(
               ([z, vals]: [string, number[]]) => {
                 traces.push({
-                  x: plots.doy ?? plots.t,
+                  x: plots.dates ?? plots.doy ?? plots.t,
                   y: vals,
                   type: s.type || "scatter",
                   mode: "lines",
@@ -87,7 +87,7 @@ export default function SubplotFigure({
             );
           } else {
             traces.push({
-              x: plots.doy ?? plots.t,
+              x: plots.dates ?? plots.doy ?? plots.t,
               y: plots[s.key],
               type: s.type || "scatter",
               mode: "lines",
@@ -103,7 +103,7 @@ export default function SubplotFigure({
             sub.secondary_yaxis.label?.toLowerCase().includes("precip") ||
             sub.secondary_yaxis.key?.toLowerCase().includes("precip");
           traces.push({
-            x: plots.doy ?? plots.t,
+            x: plots.dates ?? plots.doy ?? plots.t,
             y: plots[sub.secondary_yaxis.key],
             type: sub.secondary_yaxis.type || "bar",
             name: sub.secondary_yaxis.label,
@@ -149,7 +149,7 @@ export default function SubplotFigure({
                 paper_bgcolor: BACKGROUND,
                 plot_bgcolor: BACKGROUND,
                 xaxis: {
-                  title: sub.xlabel ?? "Day of Year",
+                  title: sub.xlabel ?? "Date",
                   showgrid: false,
                   color: AXIS_TEXT,
                   linecolor: AXIS_LINE,

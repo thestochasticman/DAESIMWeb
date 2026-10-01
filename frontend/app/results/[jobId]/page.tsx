@@ -54,7 +54,13 @@ export default function ResultsPage({ params }: { params: { jobId: string } }) {
           <p className="text-neutral-400 animate-pulse">Loading results…</p>
         )}
 
-        {data && (
+        {data && data.status !== "done" && (
+          <p className={data.status === "error" ? "text-red-400 text-sm border border-red-400/30 rounded-md p-3 bg-red-950/10" : "text-neutral-400 animate-pulse"}>
+            {data.status === "error" ? (data.error ?? "Run failed") : "Simulation still running…"}
+          </p>
+        )}
+
+        {data && data.status === "done" && (
           <>
             {/* <header className="border-b border-neutral-800 pb-2">
               <h1 className="text-3xl font-bold text-cyan-400">

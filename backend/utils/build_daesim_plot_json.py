@@ -1,9 +1,14 @@
 import numpy as np
 
-def build_daesim_plot_json(model_output, experiment, d_fd_mapping, yield_t_ha, harvest_index):
-    """Builds the full DAESIM plot JSON schema for the frontend."""
+def build_daesim_plot_json(model_output, experiment, d_fd_mapping, yield_t_ha, harvest_index, dates):
+    """Builds the full DAESIM plot JSON schema for the frontend.
+
+    ``dates`` (pandas DatetimeIndex, one per model step) is the x axis the
+    frontend prefers; ``doy`` and ``t`` are kept for older clients.
+    """
 
     doy = model_output[d_fd_mapping['Climate_doy_f']].tolist()
+    dates = [d.strftime('%Y-%m-%d') for d in dates]
 
     # Compute derived quantities
     sol_global = (
@@ -21,6 +26,7 @@ def build_daesim_plot_json(model_output, experiment, d_fd_mapping, yield_t_ha, h
 
     # ---- Numeric arrays ----
     forcing = {
+        "dates": dates,
         "doy": doy,
         "solRad_global": sol_global.tolist(),
         "solRad_direct": model_output[d_fd_mapping['Climate_solRadswskyb_f']].tolist(),
@@ -42,7 +48,8 @@ def build_daesim_plot_json(model_output, experiment, d_fd_mapping, yield_t_ha, h
     }
 
     outputs = {
-        "t": doy,  # day of year, same axis as forcing (model "t" is days since start)
+        "dates": dates,
+        "t": model_output["t"].tolist(),  # days since run start
         "LAI": model_output["LAI"].tolist(),
         "GPP": model_output["GPP"].tolist(),
         "E_mmd": model_output["E_mmd"].tolist(),
@@ -105,7 +112,7 @@ def build_daesim_plot_json(model_output, experiment, d_fd_mapping, yield_t_ha, h
                 "type": "bar",
                 "color": "gray"
             },
-            "xlabel": "Time (day of year)"
+            "xlabel": "Date"
         }
     ]
 
@@ -141,7 +148,7 @@ def build_daesim_plot_json(model_output, experiment, d_fd_mapping, yield_t_ha, h
             "id": "carbon",
             "title": "Carbon Pools",
             "yaxis_label": "Carbon Pool Size (g C m⁻²)",
-            "xlabel": "Time (day of year)",
+            "xlabel": "Date",
             "series": [
                 {"key": "Cplant", "label": "Plant", "color": "black", "alpha": 0.6},
                 {"key": "Cleaf", "label": "Leaf", "color": "green", "alpha": 0.6},
