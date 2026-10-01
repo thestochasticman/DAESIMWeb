@@ -24,19 +24,21 @@ matplotlib.use("Agg", force=True)
 app = FastAPI(title="DAESIM Backend", version="0.2.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:2000",  "http://127.0.0.1:2000"],
+    allow_origins=os.environ.get("ALLOWED_ORIGINS", "http://localhost:2000,http://127.0.0.1:2000").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-STATIC_DIR = Path('/borevitz_projects/data/')
-STATIC_DIR.mkdir(parents=True, exist_ok=True)
+# Root of the shared data volume; results live in STATIC_DIR/DAESIMWeb/.
+STATIC_DIR = Path(os.environ.get("DAESIM_STATIC_DIR", "/borevitz_projects/data/"))
+RESULTS_DIR = STATIC_DIR / "DAESIMWeb"
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 @app.post("/run", response_model=RunResponse)
 def run_job(i: Input, background_tasks:BackgroundTasks):
-    meta_path = STATIC_DIR / 'DAESIMWeb/' / f'{i.xsite}_meta.json'
+    meta_path = RESULTS_DIR / f'{i.xsite}_meta.json'
     background_tasks.add_task(run_daesim, i=i, static_dir=STATIC_DIR)
     
     
@@ -75,8 +77,8 @@ def get_results(job_id: str):
 
     # return ResultResponse(status="done", plots=plots, meta={})
 
-    plot_path = STATIC_DIR / 'DAESIMWeb'/ f'{job_id}_plot.json'
-    meta_path = STATIC_DIR / 'DAESIMWeb/' / f'{job_id}_meta.json'
+    plot_path = RESULTS_DIR / f'{job_id}_plot.json'
+    meta_path = RESULTS_DIR / f'{job_id}_meta.json'
     if not plot_path.exists():
         raise HTTPException(status_code=404, detail=f"Results for job {job_id} not found")
 

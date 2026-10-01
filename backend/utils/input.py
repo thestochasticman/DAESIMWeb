@@ -1,13 +1,9 @@
-from pydantic import BaseModel
-from pandas import Timestamp
+from pydantic import BaseModel, field_validator
 from datetime import date
-from dataclasses import dataclass
-from dataclasses_json import dataclass_json
-from typing_extensions import Self
 
-@dataclass_json
-@dataclass
-class Input:
+
+class Input(BaseModel):
+    """Request body for POST /run (matches frontend/components/QueryPanel.tsx)."""
     xsite: str
     lat: float
     lon: float
@@ -15,5 +11,7 @@ class Input:
     harvest_date: date
     crop_type: str
 
-    def __post_init__(s: Self):
-        s.crop_type = s.crop_type.capitalize()
+    @field_validator("crop_type")
+    @classmethod
+    def _capitalise(cls, v: str) -> str:
+        return v.capitalize()

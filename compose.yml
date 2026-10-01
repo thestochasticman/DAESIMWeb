@@ -1,18 +1,46 @@
 services:
   backend:
+    user: "1001:1001"
     ports:
-      - "2000:2000"  
+      - "2000:2000"
     build:
       context: .
       dockerfile: backend/Dockerfile
     container_name: daesim-backend
     environment:
+      HOME: /tmp
+      # uid 1001 has no /etc/passwd entry in the image; some libs fall back to $USER.
+      USER: yasar
       PYTHONUNBUFFERED: "1"
+      MPLBACKEND: Agg
+      # Use ONLY the conda env's packages; never a host user-site (~/.local).
+      PYTHONNOUSERSITE: "1"
       ALLOWED_ORIGINS: "http://localhost:2000,http://127.0.0.1:2000"
+      HDF5_USE_FILE_LOCKING: "FALSE"
+      # paddocktimeseries (PaddockTS 1.x) needs Python >= 3.11 -> paddockts-env.
+      PATH: /opt/conda/envs/paddockts-env/bin:/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      GDAL_DATA: /opt/conda/envs/paddockts-env/share/gdal
+      PROJ_LIB: /opt/conda/envs/paddockts-env/share/proj
+      # The three packages come from volume-mounted checkouts (edit + restart,
+      # no rebuild). DAESIM is on its `yasar` branch (vectorised hot paths).
+      PYTHONPATH: /borevitz_projects/repos/paddocktimeseries:/borevitz_projects/repos/DAESIM/src:/borevitz_projects/repos/daesim2-analysis/src
+      # troi config via env (no TROI_CONFIG file). Outputs are DAESIM's own;
+      # tmp points at PaddockTSWeb so the machine-wide SILO/OzWALD stores are shared.
+      DAESIM_STATIC_DIR: /borevitz_projects/data
+      TROI_OUTDIR: /borevitz_projects/data/DAESIMWeb/troi
+      TROI_TMPDIR: /borevitz_projects/data/PaddockTSWeb
+      TROI_EMAIL: yasaradeel@gmail.com
     volumes:
-      - ./Backend:/app/Backend
-      - /borevitz_projects/data/:/borevitz_projects/data/         
-
+      - /borevitz_projects/repos/paddocktimeseries:/borevitz_projects/repos/paddocktimeseries
+      - /borevitz_projects/repos/DAESIM:/borevitz_projects/repos/DAESIM
+      - /borevitz_projects/repos/daesim2-analysis:/borevitz_projects/repos/daesim2-analysis
+      - ./backend:/app
+      - /borevitz_projects/data/:/borevitz_projects/data/
+      - /borevitz_projects/dev/tools/miniconda3/:/opt/conda/
+      # Also at the host path: pip packages bake absolute install paths into
+      # the env (e.g. cv2/config-3.11.py), which must resolve here too.
+      - /borevitz_projects/dev/tools/miniconda3/:/borevitz_projects/dev/tools/miniconda3/
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 2000 --reload
     restart: always
     networks:
       - edge
@@ -30,31 +58,6 @@ services:
     restart: always
     networks:
       - edge
-    # volumes:
-    #   - ./frontend:/app/frontend
-    #   - /app/frontend/node_modules
-
-  # caddy:
-  #   image: caddy:2
-  #   container_name: paddock-caddy
-  #   depends_on: [frontend, backend]
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./ops/Caddyfile:/etc/caddy/Caddyfile:ro
-  #     - caddy_data:/data
-  #     - caddy_config:/config
-  #   environment:
-  #     DOMAIN: http://130.56.246.157   # e.g., app.example.com
-  #   restart: always
-  #   networks:
-  #     - default
-  #     - edge
-
-volumes:
-  caddy_data:
-  caddy_config:
 
 networks:
   edge:

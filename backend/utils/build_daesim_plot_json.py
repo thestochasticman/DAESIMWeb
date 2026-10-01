@@ -42,7 +42,7 @@ def build_daesim_plot_json(model_output, experiment, d_fd_mapping, yield_t_ha, h
     }
 
     outputs = {
-        "t": model_output["t"].tolist(),
+        "t": doy,  # day of year, same axis as forcing (model "t" is days since start)
         "LAI": model_output["LAI"].tolist(),
         "GPP": model_output["GPP"].tolist(),
         "E_mmd": model_output["E_mmd"].tolist(),

@@ -4,8 +4,8 @@ from daesim2_analysis.experiment import Experiment
 from daesim2_analysis.parameters import Parameters
 from utils.get_df_forcing import get_df_forcing
 
-from daesim2_analysis.run import *
-from PaddockTS.query import Query
+from daesim2_analysis.run import update_and_run_model
+import numpy as np
 from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
 from utils.input import Input
@@ -18,7 +18,7 @@ from json import dump
 parse_date = lambda x: Timestamp(year=x.year, month=x.month, day=x.day)
 
 def run_daesim(i: Input, static_dir: str):
-    df_forcing = get_df_forcing(i, f"{static_dir}/PaddockTSWeb")
+    df_forcing = get_df_forcing(i)
     experiment = Experiment(
         xsite=i.xsite,
         CLatDeg=i.lat,
@@ -34,13 +34,14 @@ def run_daesim(i: Input, static_dir: str):
 
     parameters: Parameters = experiment.parameters
     filename_write = f"DAESIM2-Plant_{experiment.xsite}_{experiment.crop_type}.nc"
+    # daesim2-analysis >= f3d3b97 returns {"metrics": ..., "diagnostics": ...}
     model_output = update_and_run_model(
-        parameters.init, 
+        parameters.init,
         experiment.PlantX,
         experiment.input_data,
         parameters.df,
         parameters.problem
-    )
+    )["diagnostics"]
 
     # if not exists(f"{experiment.dir_results}{filename_write}"):
 
@@ -119,36 +120,39 @@ def run_daesim(i: Input, static_dir: str):
     plt.tight_layout()
     plt.savefig(f'{experiment.dir_results}{i.xsite}_df_forcing.png')
     plt.close()
+    # Model time 't' counts days since the run start; plot outputs against day of
+    # year so the x-axis matches the forcing panel and the axis limits below.
+    t_doy = model_output[d_fd_mapping['Climate_doy_f']]
     fig, axes = plt.subplots(5,1,figsize=(8,10),sharex=True)
 
-    axes[0].plot(model_output['t'], model_output["LAI"])
+    axes[0].plot(t_doy, model_output["LAI"])
     axes[0].set_ylabel("LAI\n"+r"($\rm m^2 \; m^{-2}$)")
     axes[0].tick_params(axis='x', labelrotation=45)
     axes[0].annotate("Leaf area index", (0.01,0.93), xycoords='axes fraction', verticalalignment='top', horizontalalignment='left', fontsize=12)
     axes[0].set_ylim([0,6.5])
 
-    axes[1].plot(model_output["t"], model_output["GPP"])
+    axes[1].plot(t_doy, model_output["GPP"])
     axes[1].set_ylabel("GPP\n"+r"($\rm g C \; m^{-2} \; d^{-1}$)")
     axes[1].tick_params(axis='x', labelrotation=45)
     axes[1].annotate("Photosynthesis", (0.01,0.93), xycoords='axes fraction', verticalalignment='top', horizontalalignment='left', fontsize=12)
     axes[1].set_ylim([0,30])
 
-    axes[2].plot(model_output["t"], model_output["E_mmd"])
+    axes[2].plot(t_doy, model_output["E_mmd"])
     axes[2].set_ylabel(r"$\rm E$"+"\n"+r"($\rm mm \; d^{-1}$)")
     axes[2].tick_params(axis='x', labelrotation=45)
     axes[2].annotate("Transpiration Rate", (0.01,0.93), xycoords='axes fraction', verticalalignment='top', horizontalalignment='left', fontsize=12)
     axes[2].set_ylim([0,6])
 
-    axes[3].plot(model_output["t"], model_output["Bio_time"])
+    axes[3].plot(t_doy, model_output["Bio_time"])
     axes[3].set_ylabel("Thermal Time\n"+r"($\rm ^{\circ}$C d)")
     axes[3].annotate("Growing Degree Days", (0.01,0.93), xycoords='axes fraction', verticalalignment='top', horizontalalignment='left', fontsize=12)
 
     alp = 0.6
-    axes[4].plot(model_output["t"], model_output["Cleaf"]+model_output["Croot"]+model_output["Cstem"]+model_output["Cseed"],c='k',label="Plant", alpha=alp)
-    axes[4].plot(model_output["t"], model_output["Cleaf"],label="Leaf", alpha=alp)
-    axes[4].plot(model_output["t"], model_output["Cstem"],label="Stem", alpha=alp)
-    axes[4].plot(model_output["t"], model_output["Croot"],label="Root", alpha=alp)
-    axes[4].plot(model_output["t"], model_output["Cseed"],label="Seed", alpha=alp)
+    axes[4].plot(t_doy, model_output["Cleaf"]+model_output["Croot"]+model_output["Cstem"]+model_output["Cseed"],c='k',label="Plant", alpha=alp)
+    axes[4].plot(t_doy, model_output["Cleaf"],label="Leaf", alpha=alp)
+    axes[4].plot(t_doy, model_output["Cstem"],label="Stem", alpha=alp)
+    axes[4].plot(t_doy, model_output["Croot"],label="Root", alpha=alp)
+    axes[4].plot(t_doy, model_output["Cseed"],label="Seed", alpha=alp)
     axes[4].set_ylabel("Carbon Pool Size\n"+r"(g C $\rm m^{-2}$)")
     axes[4].set_xlabel("Time (day of year)")
     axes[4].legend(loc=3,fontsize=9,handlelength=0.8)
